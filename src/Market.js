@@ -57,19 +57,19 @@ export default class Market {
         this.marketPrice = nextOrder.orderPrice;
         this.history.push(result.trade);
       }
-    } while(!order.isFilled());
+    } while (!order.isFilled());
 
     if (order.orderType === 'sell') {
       let nextStop = this.sellStops.peek();
       if (nextStop && nextStop.orderPrice < this.marketPrice) {
         nextStop = this.sellStops.pop();
-        const filled = this.fillAtMarket(nextStop);
+        this.fillAtMarket(nextStop);
       }
     } else if (order.orderType === 'buy') {
       let nextStop = this.buyStops.peek();
       if (nextStop && nextStop.orderPrice > this.marketPrice) {
         nextStop = this.buyStops.pop();
-        const filled = this.fillAtMarket(nextStop);
+        this.fillAtMarket(nextStop);
       }
     }
 
