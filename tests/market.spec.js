@@ -85,7 +85,7 @@ test('market price is correct after small market buy', () => {
   market.addOrder(sellOrderTwo);
   const marketOrder = new Order(null, 10, 'buy', 'market');
   market.fillAtMarket(marketOrder);
-  expect(market.marketPrice).toBe(100);
+  expect(market.getMarketPrice()).toBe(100);
   expect(marketOrder.filled).toBe(10);
 });
 
@@ -96,7 +96,7 @@ test('market price is correct after large market buy', () => {
   market.addOrder(sellOrderTwo);
   const marketOrder = new Order(null, 150, 'buy', 'market');
   market.fillAtMarket(marketOrder);
-  expect(market.marketPrice).toBe(110);
+  expect(market.getMarketPrice()).toBe(110);
   expect(marketOrder.filled).toBe(150);
 });
 
@@ -107,7 +107,7 @@ test('market price is correct after small market sell', () => {
   market.addOrder(sellOrderTwo);
   const marketOrder = new Order(null, 10, 'sell', 'market');
   market.fillAtMarket(marketOrder);
-  expect(market.marketPrice).toBe(110);
+  expect(market.getMarketPrice()).toBe(110);
   expect(marketOrder.filled).toBe(10);
 });
 
@@ -118,7 +118,7 @@ test('market price is correct after large market sell', () => {
   market.addOrder(sellOrderTwo);
   const marketOrder = new Order(null, 150, 'sell', 'market');
   market.fillAtMarket(marketOrder);
-  expect(market.marketPrice).toBe(100);
+  expect(market.getMarketPrice()).toBe(100);
   expect(marketOrder.filled).toBe(150);
 });
 

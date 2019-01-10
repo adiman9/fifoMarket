@@ -7,8 +7,14 @@ export default class Market {
     this.sells = new TinyQueue([], sellComparator);
     this.buyStops = new TinyQueue([], buyComparator);
     this.sellStops = new TinyQueue([], sellComparator);
-    this.marketPrice = null;
     this.history = [];
+  }
+
+  getMarketPrice() {
+    if (this.history.length) {
+      return this.history[this.history.length - 1].price;
+    }
+    return null;
   }
 
   addOrder(order) {
@@ -54,20 +60,19 @@ export default class Market {
       if (result.filled === 0) {
         orderBook.pop();
       } else {
-        this.marketPrice = nextOrder.orderPrice;
         this.history.push(result.trade);
       }
     } while (!order.isFilled());
 
     if (order.orderType === 'sell') {
       let nextStop = this.sellStops.peek();
-      if (nextStop && nextStop.orderPrice < this.marketPrice) {
+      if (nextStop && nextStop.orderPrice < this.getMarketPrice()) {
         nextStop = this.sellStops.pop();
         this.fillAtMarket(nextStop);
       }
     } else if (order.orderType === 'buy') {
       let nextStop = this.buyStops.peek();
-      if (nextStop && nextStop.orderPrice > this.marketPrice) {
+      if (nextStop && nextStop.orderPrice > this.getMarketPrice()) {
         nextStop = this.buyStops.pop();
         this.fillAtMarket(nextStop);
       }
