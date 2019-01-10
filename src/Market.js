@@ -5,18 +5,30 @@ export default class Market {
   constructor() {
     this.buys = new TinyQueue([], buyComparator);
     this.sells = new TinyQueue([], sellComparator);
+    this.buyStops = new TinyQueue([], buyComparator);
+    this.sellStops = new TinyQueue([], sellComparator);
     this.marketPrice = null;
   }
 
   addOrder(order) {
-    // TODO add stop orders Thu 10 Jan 00:04:07 2019
-    if (order.orderType === 'buy') {
-      this.buys.push(order);
-      return true;
-    }
-    if (order.orderType === 'sell') {
-      this.sells.push(order);
-      return true;
+    if (order.orderMethod === 'stop') {
+      if (order.orderType === 'buy') {
+        this.buyStops.push(order);
+        return true;
+      }
+      if (order.orderType === 'sell') {
+        this.sellStops.push(order);
+        return true;
+      }
+    } else if (order.orderMethod === 'limit') {
+      if (order.orderType === 'buy') {
+        this.buys.push(order);
+        return true;
+      }
+      if (order.orderType === 'sell') {
+        this.sells.push(order);
+        return true;
+      }
     }
     return false;
   }
@@ -47,6 +59,23 @@ export default class Market {
       }
     } while(totalFilled < amount);
 
+    if (type === 'sell') {
+      let nextStop = this.sellStops.peek();
+      if (nextStop && nextStop.orderPrice < this.marketPrice) {
+        nextStop = this.sellStops.pop();
+        // TODO populate the stop order with fills Thu 10 Jan 01:08:49 2019
+        const filled = this.fillAtMarket(nextStop.orderPrice, 'sell');
+        // TODO maybe allow simply passing an order into the fillAtMarket function Thu 10 Jan 01:10:38 2019
+      }
+    } else if (type === 'buy') {
+      let nextStop = this.buyStops.peek();
+      if (nextStop && nextStop.orderPrice > this.marketPrice) {
+        nextStop = this.buyStops.pop();
+        const filled = this.fillAtMarket(nextStop.orderPrice, 'buy');
+      }
+    }
+
+    // TODO return richer data about fills Thu 10 Jan 01:07:36 2019
     return totalFilled;
   }
 }

@@ -5,8 +5,8 @@ describe('testing comparators different price', () => {
   let orderA;
   let orderB;
   beforeEach(() => {
-    orderA = new Order(100, 100, 'sell');
-    orderB = new Order(101, 100, 'sell');
+    orderA = new Order(100, 100, 'sell', 'limit');
+    orderB = new Order(101, 100, 'sell', 'limit');
   });
 
   test('buy comparator different prices', () => {
@@ -42,9 +42,9 @@ describe('testing comparators same price', () => {
   let orderA;
   let orderB;
   beforeEach(() => {
-    orderA = new Order(100, 100, 'sell');
+    orderA = new Order(100, 100, 'sell', 'limit');
     orderA.createdTime = 100;
-    orderB = new Order(100, 100, 'sell');
+    orderB = new Order(100, 100, 'sell', 'limit');
     orderB.createdTime = 99;
   });
 

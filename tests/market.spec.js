@@ -7,25 +7,25 @@ beforeEach(() => {
 });
 
 test('return false when adding nonsense order', () => {
-  const order = new Order(100, 100, 'nonsense');
+  const order = new Order(100, 100, 'nonsense', 'limit');
   const res = market.addOrder(order);
   expect(res).toBe(false);
 });
 
 test('return true when adding buy', () => {
-  const order = new Order(100, 100, 'buy');
+  const order = new Order(100, 100, 'buy', 'limit');
   const res = market.addOrder(order);
   expect(res).toBe(true);
 });
 
 test('return true when adding sell', () => {
-  const order = new Order(100, 100, 'sell');
+  const order = new Order(100, 100, 'sell', 'limit');
   const res = market.addOrder(order);
   expect(res).toBe(true);
 });
 
 test('fill market buy', () => {
-  const sellOrder = new Order(100, 100, 'sell');
+  const sellOrder = new Order(100, 100, 'sell', 'limit');
   market.addOrder(sellOrder);
   const amount = 10;
   const filled = market.fillAtMarket(amount, 'buy');
@@ -33,7 +33,7 @@ test('fill market buy', () => {
 });
 
 test('fill market sell', () => {
-  const buyOrder = new Order(100, 100, 'buy');
+  const buyOrder = new Order(100, 100, 'buy', 'limit');
   market.addOrder(buyOrder);
   const amount = 10;
   const filled = market.fillAtMarket(amount, 'sell');
@@ -52,7 +52,7 @@ test('return 0 when no orders to fill against for market sell', () => {
 
 test('partial fill market buy', () => {
   const orderAmount = 100;
-  const sellOrder = new Order(100, orderAmount, 'sell');
+  const sellOrder = new Order(100, orderAmount, 'sell', 'limit');
   market.addOrder(sellOrder);
   const filled = market.fillAtMarket(150, 'buy');
   expect(filled).toBe(orderAmount);
@@ -60,15 +60,15 @@ test('partial fill market buy', () => {
 
 test('partial fill market sell', () => {
   const orderAmount = 100;
-  const buyOrder = new Order(100, orderAmount, 'buy');
+  const buyOrder = new Order(100, orderAmount, 'buy', 'limit');
   market.addOrder(buyOrder);
   const filled = market.fillAtMarket(150, 'sell');
   expect(filled).toBe(orderAmount);
 });
 
 test('market price is correct after small market buy', () => {
-  const sellOrderOne = new Order(110, 100, 'sell');
-  const sellOrderTwo = new Order(100, 100, 'sell');
+  const sellOrderOne = new Order(110, 100, 'sell', 'limit');
+  const sellOrderTwo = new Order(100, 100, 'sell', 'limit');
   market.addOrder(sellOrderOne);
   market.addOrder(sellOrderTwo);
   market.fillAtMarket(10, 'buy');
@@ -76,8 +76,8 @@ test('market price is correct after small market buy', () => {
 });
 
 test('market price is correct after large market buy', () => {
-  const sellOrderOne = new Order(110, 100, 'sell');
-  const sellOrderTwo = new Order(100, 100, 'sell');
+  const sellOrderOne = new Order(110, 100, 'sell', 'limit');
+  const sellOrderTwo = new Order(100, 100, 'sell', 'limit');
   market.addOrder(sellOrderOne);
   market.addOrder(sellOrderTwo);
   market.fillAtMarket(150, 'buy');
@@ -85,8 +85,8 @@ test('market price is correct after large market buy', () => {
 });
 
 test('market price is correct after small market sell', () => {
-  const sellOrderOne = new Order(110, 100, 'buy');
-  const sellOrderTwo = new Order(100, 100, 'buy');
+  const sellOrderOne = new Order(110, 100, 'buy', 'limit');
+  const sellOrderTwo = new Order(100, 100, 'buy', 'limit');
   market.addOrder(sellOrderOne);
   market.addOrder(sellOrderTwo);
   market.fillAtMarket(10, 'sell');
@@ -94,8 +94,8 @@ test('market price is correct after small market sell', () => {
 });
 
 test('market price is correct after large market sell', () => {
-  const sellOrderOne = new Order(110, 100, 'buy');
-  const sellOrderTwo = new Order(100, 100, 'buy');
+  const sellOrderOne = new Order(110, 100, 'buy', 'limit');
+  const sellOrderTwo = new Order(100, 100, 'buy', 'limit');
   market.addOrder(sellOrderOne);
   market.addOrder(sellOrderTwo);
   market.fillAtMarket(150, 'sell');
