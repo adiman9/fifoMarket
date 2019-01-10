@@ -121,3 +121,6 @@ test('market price is correct after large market sell', () => {
   expect(market.marketPrice).toBe(100);
   expect(marketOrder.filled).toBe(150);
 });
+
+// TODO test for stops being added Thu 10 Jan 23:34:09 2019
+// test for stops being triggered

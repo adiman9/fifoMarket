@@ -24,7 +24,18 @@ export default class Order {
     if (order.orderType === this.orderType) {
       return false;
     }
-    return order.orderType === 'buy' || order.orderType === 'sell';
+    if (order.orderMethod === 'market') {
+      return order.orderType === 'buy' || order.orderType === 'sell';
+    }
+    if (order.orderMethod === 'limit') {
+      if (order.orderType === 'buy') {
+        return order.orderPrice >= this.orderPrice;
+      }
+      if (order.orderType === 'sell') {
+        return order.orderPrice <= this.orderPrice;
+      }
+    }
+    return false;
   }
 
   isFilled() {

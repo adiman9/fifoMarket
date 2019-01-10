@@ -76,3 +76,8 @@ describe('testing comparators same price', () => {
     expect(q.pop()).toBe(orderB)
   });
 });
+
+// TODO tests for validating orders Thu 10 Jan 23:33:02 2019
+// test for isFilled
+// test for leftToFill
+// test for attemptFill
