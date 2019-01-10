@@ -8,6 +8,7 @@ export default class Market {
     this.buyStops = new TinyQueue([], buyComparator);
     this.sellStops = new TinyQueue([], sellComparator);
     this.marketPrice = null;
+    this.history = [];
   }
 
   addOrder(order) {
@@ -33,49 +34,45 @@ export default class Market {
     return false;
   }
 
-  fillAtMarket(amount, type) {
+  fillAtMarket(order) {
     let orderBook;
-    if (type === 'sell') {
+    if (order.orderType === 'sell') {
       orderBook = this.buys;
-    } else if (type === 'buy') {
+    } else if (order.orderType === 'buy') {
       orderBook = this.sells;
     } else {
       return false;
     }
 
-    let totalFilled = 0;
     do {
       const nextOrder = orderBook.peek();
       if (!nextOrder) {
         break;
       }
-      const filled = nextOrder.attemptFill(amount - totalFilled);
-      if (filled === 0) {
+      const result = nextOrder.attemptFill(order);
+
+      if (result.filled === 0) {
         orderBook.pop();
       } else {
-        totalFilled += filled;
         this.marketPrice = nextOrder.orderPrice;
-        // TODO create a fill object and save it to the market history Wed  9 Jan 23:22:57 2019
+        this.history.push(result.trade);
       }
-    } while(totalFilled < amount);
+    } while(!order.isFilled());
 
-    if (type === 'sell') {
+    if (order.orderType === 'sell') {
       let nextStop = this.sellStops.peek();
       if (nextStop && nextStop.orderPrice < this.marketPrice) {
         nextStop = this.sellStops.pop();
-        // TODO populate the stop order with fills Thu 10 Jan 01:08:49 2019
-        const filled = this.fillAtMarket(nextStop.orderPrice, 'sell');
-        // TODO maybe allow simply passing an order into the fillAtMarket function Thu 10 Jan 01:10:38 2019
+        const filled = this.fillAtMarket(nextStop);
       }
-    } else if (type === 'buy') {
+    } else if (order.orderType === 'buy') {
       let nextStop = this.buyStops.peek();
       if (nextStop && nextStop.orderPrice > this.marketPrice) {
         nextStop = this.buyStops.pop();
-        const filled = this.fillAtMarket(nextStop.orderPrice, 'buy');
+        const filled = this.fillAtMarket(nextStop);
       }
     }
 
-    // TODO return richer data about fills Thu 10 Jan 01:07:36 2019
-    return totalFilled;
+    return order;
   }
 }
