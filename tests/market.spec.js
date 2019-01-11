@@ -343,4 +343,27 @@ test('market fill should accept sell limit below market', () => {
   expect(sellLimit.executed).toBe(true);
 });
 
+test('market should publish trade', () => {
+  const buyOrderOne = new Order(110, 100, 'buy', 'limit');
+  const buyOrderTwo = new Order(100, 160, 'buy', 'limit');
+  market.addOrder(buyOrderOne);
+  market.addOrder(buyOrderTwo);
+
+  const marketOrder = new Order(null, 60, 'sell', 'market');
+
+  market.subscribe(trade => {
+    expect(trade).toBe(marketOrder.trades[0]);
+  });
+
+  market.fillAtMarket(marketOrder);
+});
+
+test('it should unsubscribe from market feed', () => {
+  const unsub = market.subscribe(trade => {});
+  market.subscribe(trade => {});
+  expect(market.subscribers.length).toBe(2);
+  unsub();
+  expect(market.subscribers.length).toBe(1);
+});
+
 // TODO maybe make stop order a sub class of Order to add a triggered property Fri 11 Jan 18:36:15 2019
