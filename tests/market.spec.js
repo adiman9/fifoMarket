@@ -1,5 +1,5 @@
 import Market from '../src';
-import Order from '../src/Order';
+import Order, {StopOrder} from '../src/Order';
 
 let market;
 beforeEach(() => {
@@ -123,16 +123,16 @@ test('market price is correct after large market sell', () => {
 });
 
 test('correctly adds buy stops', () => {
-  const buyStopOne = new Order(110, 100, 'buy', 'stop');
-  const buyStopTwo = new Order(100, 100, 'buy', 'stop');
+  const buyStopOne = new StopOrder(110, 100, 'buy');
+  const buyStopTwo = new StopOrder(100, 100, 'buy');
   market.addOrder(buyStopOne);
   market.addOrder(buyStopTwo);
   expect(market.buyStops.length).toBe(2);
 });
 
 test('correctly adds sell stops', () => {
-  const sellStopOne = new Order(110, 100, 'sell', 'stop');
-  const sellStopTwo = new Order(100, 100, 'sell', 'stop');
+  const sellStopOne = new StopOrder(110, 100, 'sell');
+  const sellStopTwo = new StopOrder(100, 100, 'sell');
   market.addOrder(sellStopOne);
   market.addOrder(sellStopTwo);
   expect(market.sellStops.length).toBe(2);
@@ -144,8 +144,8 @@ test('market triggers sell stops', () => {
   market.addOrder(buyOrderOne);
   market.addOrder(buyOrderTwo);
 
-  const sellStopOne = new Order(110, 100, 'sell', 'stop');
-  const sellStopTwo = new Order(100, 100, 'sell', 'stop');
+  const sellStopOne = new StopOrder(110, 100, 'sell');
+  const sellStopTwo = new StopOrder(100, 100, 'sell');
   market.addOrder(sellStopOne);
   market.addOrder(sellStopTwo);
   expect(market.sellStops.length).toBe(2);
@@ -168,8 +168,8 @@ test('market only triggers necessary sell stops', () => {
   market.addOrder(buyOrderOne);
   market.addOrder(buyOrderTwo);
 
-  const sellStopOne = new Order(110, 100, 'sell', 'stop');
-  const sellStopTwo = new Order(100, 100, 'sell', 'stop');
+  const sellStopOne = new StopOrder(110, 100, 'sell');
+  const sellStopTwo = new StopOrder(100, 100, 'sell');
   market.addOrder(sellStopOne);
   market.addOrder(sellStopTwo);
   expect(market.sellStops.length).toBe(2);
@@ -192,8 +192,8 @@ test('market triggers buy stops', () => {
   market.addOrder(sellOrderOne);
   market.addOrder(sellOrderTwo);
 
-  const buyStopOne = new Order(100, 100, 'buy', 'stop');
-  const buyStopTwo = new Order(105, 100, 'buy', 'stop');
+  const buyStopOne = new StopOrder(100, 100, 'buy');
+  const buyStopTwo = new StopOrder(105, 100, 'buy');
   market.addOrder(buyStopOne);
   market.addOrder(buyStopTwo);
   expect(market.buyStops.length).toBe(2);
@@ -217,8 +217,8 @@ test('market only triggers necessary buy stops', () => {
   market.addOrder(sellOrderOne);
   market.addOrder(sellOrderTwo);
 
-  const buyStopOne = new Order(100, 100, 'buy', 'stop');
-  const buyStopTwo = new Order(105, 100, 'buy', 'stop');
+  const buyStopOne = new StopOrder(100, 100, 'buy');
+  const buyStopTwo = new StopOrder(105, 100, 'buy');
   market.addOrder(buyStopOne);
   market.addOrder(buyStopTwo);
   expect(market.buyStops.length).toBe(2);
@@ -244,8 +244,8 @@ test('market price should update on buy stops filling', () => {
   market.addOrder(sellOrderTwo);
   market.addOrder(sellOrderThree);
 
-  const buyStopOne = new Order(100, 100, 'buy', 'stop');
-  const buyStopTwo = new Order(110, 100, 'buy', 'stop');
+  const buyStopOne = new StopOrder(100, 100, 'buy');
+  const buyStopTwo = new StopOrder(110, 100, 'buy');
   market.addOrder(buyStopOne);
   market.addOrder(buyStopTwo);
   expect(market.buyStops.length).toBe(2);
@@ -266,8 +266,8 @@ test('market price should update on sell stops filling', () => {
   market.addOrder(buyOrderTwo);
   market.addOrder(buyOrderThree);
 
-  const sellStopOne = new Order(110, 100, 'sell', 'stop');
-  const sellStopTwo = new Order(100, 100, 'sell', 'stop');
+  const sellStopOne = new StopOrder(110, 100, 'sell');
+  const sellStopTwo = new StopOrder(100, 100, 'sell');
   market.addOrder(sellStopOne);
   market.addOrder(sellStopTwo);
   expect(market.sellStops.length).toBe(2);
@@ -366,4 +366,40 @@ test('it should unsubscribe from market feed', () => {
   expect(market.subscribers.length).toBe(1);
 });
 
-// TODO maybe make stop order a sub class of Order to add a triggered property Fri 11 Jan 18:36:15 2019
+test('it should only fill a triggered sell stop', () => {
+  const buyOrderOne = new Order(110, 100, 'buy', 'limit');
+  const buyOrderTwo = new Order(100, 160, 'buy', 'limit');
+  market.addOrder(buyOrderOne);
+  market.addOrder(buyOrderTwo);
+
+  const sellStop = new StopOrder(110, 100, 'sell');
+  market.fillAtMarket(sellStop);
+
+  expect(sellStop.executed).toBe(false);
+  expect(sellStop.filled).toBe(0);
+
+  sellStop.trigger();
+  market.fillAtMarket(sellStop);
+
+  expect(sellStop.executed).toBe(true);
+  expect(sellStop.filled).toBe(100);
+});
+
+test('it should only fill a triggered buy stop', () => {
+  const sellOrderOne = new Order(110, 100, 'sell', 'limit');
+  const sellOrderTwo = new Order(100, 160, 'sell', 'limit');
+  market.addOrder(sellOrderOne);
+  market.addOrder(sellOrderTwo);
+
+  const buyStop = new StopOrder(110, 100, 'buy');
+  market.fillAtMarket(buyStop);
+
+  expect(buyStop.executed).toBe(false);
+  expect(buyStop.filled).toBe(0);
+
+  buyStop.trigger();
+  market.fillAtMarket(buyStop);
+
+  expect(buyStop.executed).toBe(true);
+  expect(buyStop.filled).toBe(100);
+});

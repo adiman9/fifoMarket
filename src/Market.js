@@ -72,12 +72,14 @@ export default class Market {
       let nextStop = this.sellStops.peek();
       if (nextStop && nextStop.orderPrice >= this.getMarketPrice()) {
         nextStop = this.sellStops.pop();
+        nextStop.trigger();
         this.fillAtMarket(nextStop);
       }
     } else if (order.orderType === 'buy') {
       let nextStop = this.buyStops.peek();
       if (nextStop && nextStop.orderPrice <= this.getMarketPrice()) {
         nextStop = this.buyStops.pop();
+        nextStop.trigger();
         this.fillAtMarket(nextStop);
       }
     }

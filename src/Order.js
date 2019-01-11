@@ -21,13 +21,17 @@ export default class Order {
   }
 
   validate(order) {
+    if (order instanceof StopOrder) {
+      // eslint-disable-line
+      return order.triggered;
+    }
     if (order.orderType !== 'sell' && order.orderType !== 'buy') {
       return false;
     }
     if (order.orderType === this.orderType) {
       return false;
     }
-    if (order.orderMethod === 'market' || order.orderMethod === 'stop') {
+    if (order.orderMethod === 'market') {
       return order.orderType === 'buy' || order.orderType === 'sell';
     }
     if (order.orderMethod === 'limit') {
@@ -88,6 +92,19 @@ export default class Order {
       filled,
       trade,
     };
+  }
+}
+
+export class StopOrder extends Order {
+  constructor(price, quantity, type) {
+    super(price, quantity, type, 'stop');
+    this.triggered = false;
+    this.triggeredTime = null;
+  }
+
+  trigger() {
+    this.triggered = true;
+    this.triggeredTime = new Date().getTime();
   }
 }
 
