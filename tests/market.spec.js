@@ -183,5 +183,68 @@ test('market triggers buy stops', () => {
   expect(buyStopTwo.trades.length).toBe(1);
 });
 
-// TODO Thu 10 Jan 23:34:09 2019
-// test for passing limit orders that shouldn't fill into the fillAtMarket method
+test('market fill should reject buy limit below market', () => {
+  const sellOrderOne = new Order(110, 100, 'sell', 'limit');
+  const sellOrderTwo = new Order(100, 160, 'sell', 'limit');
+  market.addOrder(sellOrderOne);
+  market.addOrder(sellOrderTwo);
+  // done so market has a price
+  const buyMarket = new Order(null, 10, 'buy', 'market');
+  market.fillAtMarket(buyMarket);
+
+  const buyLimit = new Order(80, 160, 'buy', 'limit');
+  market.fillAtMarket(buyLimit);
+
+  expect(buyLimit.filled).toBe(0);
+  expect(buyLimit.executed).toBe(false);
+});
+
+test('market fill should accept buy limit above market', () => {
+  const sellOrderOne = new Order(110, 100, 'sell', 'limit');
+  const sellOrderTwo = new Order(100, 160, 'sell', 'limit');
+  market.addOrder(sellOrderOne);
+  market.addOrder(sellOrderTwo);
+  // done so market has a price
+  const buyMarket = new Order(null, 10, 'buy', 'market');
+  market.fillAtMarket(buyMarket);
+
+  const buyLimit = new Order(150, 160, 'buy', 'limit');
+  market.fillAtMarket(buyLimit);
+
+  expect(buyLimit.filled).toBe(160);
+  expect(buyLimit.executed).toBe(true);
+});
+
+test('market fill should reject sell limit above market', () => {
+  const buyOrderOne = new Order(110, 100, 'buy', 'limit');
+  const buyOrderTwo = new Order(100, 160, 'buy', 'limit');
+  market.addOrder(buyOrderOne);
+  market.addOrder(buyOrderTwo);
+  // done so market has a price
+  const sellMarket = new Order(null, 10, 'sell', 'market');
+  market.fillAtMarket(sellMarket);
+
+  const sellLimit = new Order(150, 160, 'sell', 'limit');
+  market.fillAtMarket(sellLimit);
+
+  expect(sellLimit.filled).toBe(0);
+  expect(sellLimit.executed).toBe(false);
+});
+
+test('market fill should accept sell limit below market', () => {
+  const buyOrderOne = new Order(110, 100, 'buy', 'limit');
+  const buyOrderTwo = new Order(100, 160, 'buy', 'limit');
+  market.addOrder(buyOrderOne);
+  market.addOrder(buyOrderTwo);
+  // done so market has a price
+  const sellMarket = new Order(null, 10, 'sell', 'market');
+  market.fillAtMarket(sellMarket);
+
+  const sellLimit = new Order(90, 160, 'sell', 'limit');
+  market.fillAtMarket(sellLimit);
+
+  expect(sellLimit.filled).toBe(160);
+  expect(sellLimit.executed).toBe(true);
+});
+
+// TODO maybe make stop order a sub class of Order to add a triggered property Fri 11 Jan 18:36:15 2019
