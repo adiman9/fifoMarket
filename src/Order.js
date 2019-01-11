@@ -3,6 +3,7 @@ export class Trade {
     this.price = price;
     this.amount = amount;
     this.initiatingType = type;
+    this.tradeTime = new Date().getTime();
   }
 }
 
