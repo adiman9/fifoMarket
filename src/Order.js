@@ -20,11 +20,13 @@ export default class Order {
   }
 
   validate(order) {
-    // TODO flesh out validation Thu 10 Jan 19:32:22 2019
+    if (order.orderType !== 'sell' && order.orderType !== 'buy') {
+      return false;
+    }
     if (order.orderType === this.orderType) {
       return false;
     }
-    if (order.orderMethod === 'market') {
+    if (order.orderMethod === 'market' || order.orderMethod === 'stop') {
       return order.orderType === 'buy' || order.orderType === 'sell';
     }
     if (order.orderMethod === 'limit') {
@@ -70,17 +72,9 @@ export default class Order {
     if (!this.isFilled() && this.validate(order)) {
       const amtLeft = this.quantity - this.filled;
       if (order.leftToFill() >= amtLeft) {
-        trade = new Trade(
-          amtLeft,
-          this.orderPrice,
-          order.orderType
-        );
+        trade = new Trade(amtLeft, this.orderPrice, order.orderType);
       } else {
-        trade = new Trade(
-          order.leftToFill(),
-          this.orderPrice,
-          order.orderType
-        );
+        trade = new Trade(order.leftToFill(), this.orderPrice, order.orderType);
       }
 
       this.addTrade(trade);
@@ -92,7 +86,7 @@ export default class Order {
       order,
       filled,
       trade,
-    }
+    };
   }
 }
 
@@ -107,7 +101,7 @@ export const buyComparator = (orderA, orderB) => {
   }
 
   return compareVal;
-}
+};
 
 export const sellComparator = (orderA, orderB) => {
   let compareVal = 0;
@@ -120,4 +114,4 @@ export const sellComparator = (orderA, orderB) => {
   }
 
   return compareVal;
-}
+};

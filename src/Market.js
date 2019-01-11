@@ -5,8 +5,8 @@ export default class Market {
   constructor() {
     this.buys = new TinyQueue([], buyComparator);
     this.sells = new TinyQueue([], sellComparator);
-    this.buyStops = new TinyQueue([], buyComparator);
-    this.sellStops = new TinyQueue([], sellComparator);
+    this.buyStops = new TinyQueue([], sellComparator);
+    this.sellStops = new TinyQueue([], buyComparator);
     this.history = [];
   }
 
@@ -57,8 +57,10 @@ export default class Market {
       }
       const result = nextOrder.attemptFill(order);
 
-      if (result.filled === 0) {
+      if (result.filled === 0 && nextOrder.isFilled()) {
         orderBook.pop();
+      } else if (result.filled === 0 && !nextOrder.isFilled()) {
+        break;
       } else {
         this.history.push(result.trade);
       }
@@ -66,13 +68,13 @@ export default class Market {
 
     if (order.orderType === 'sell') {
       let nextStop = this.sellStops.peek();
-      if (nextStop && nextStop.orderPrice < this.getMarketPrice()) {
+      if (nextStop && nextStop.orderPrice >= this.getMarketPrice()) {
         nextStop = this.sellStops.pop();
         this.fillAtMarket(nextStop);
       }
     } else if (order.orderType === 'buy') {
       let nextStop = this.buyStops.peek();
-      if (nextStop && nextStop.orderPrice > this.getMarketPrice()) {
+      if (nextStop && nextStop.orderPrice <= this.getMarketPrice()) {
         nextStop = this.buyStops.pop();
         this.fillAtMarket(nextStop);
       }
