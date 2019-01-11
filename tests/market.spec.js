@@ -183,6 +183,45 @@ test('market triggers buy stops', () => {
   expect(buyStopTwo.trades.length).toBe(1);
 });
 
+test('market price should update on buy stops filling', () => {
+  const sellOrderOne = new Order(110, 100, 'sell', 'limit');
+  const sellOrderTwo = new Order(100, 160, 'sell', 'limit');
+  const sellOrderThree = new Order(150, 160, 'sell', 'limit');
+  market.addOrder(sellOrderOne);
+  market.addOrder(sellOrderTwo);
+  market.addOrder(sellOrderThree);
+
+  const buyStopOne = new Order(100, 100, 'buy', 'stop');
+  const buyStopTwo = new Order(110, 100, 'buy', 'stop');
+  market.addOrder(buyStopOne);
+  market.addOrder(buyStopTwo);
+
+  const marketOrder = new Order(null, 90, 'buy', 'market');
+
+  market.fillAtMarket(marketOrder);
+
+  expect(market.getMarketPrice()).toBe(150);
+});
+
+test('market price should update on sell stops filling', () => {
+  const buyOrderOne = new Order(110, 100, 'buy', 'limit');
+  const buyOrderTwo = new Order(100, 160, 'buy', 'limit');
+  const buyOrderThree = new Order(90, 160, 'buy', 'limit');
+  market.addOrder(buyOrderOne);
+  market.addOrder(buyOrderTwo);
+  market.addOrder(buyOrderThree);
+
+  const sellStopOne = new Order(110, 100, 'sell', 'stop');
+  const sellStopTwo = new Order(100, 100, 'sell', 'stop');
+  market.addOrder(sellStopOne);
+  market.addOrder(sellStopTwo);
+
+  const marketOrder = new Order(null, 160, 'sell', 'market');
+  market.fillAtMarket(marketOrder);
+
+  expect(market.getMarketPrice()).toBe(90);
+});
+
 test('market fill should reject buy limit below market', () => {
   const sellOrderOne = new Order(110, 100, 'sell', 'limit');
   const sellOrderTwo = new Order(100, 160, 'sell', 'limit');
