@@ -22,7 +22,6 @@ export default class Order {
 
   validate(order) {
     if (order instanceof StopOrder) {
-      // eslint-disable-line
       return order.triggered;
     }
     if (order.orderType !== 'sell' && order.orderType !== 'buy') {
