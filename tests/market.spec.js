@@ -148,16 +148,42 @@ test('market triggers sell stops', () => {
   const sellStopTwo = new Order(100, 100, 'sell', 'stop');
   market.addOrder(sellStopOne);
   market.addOrder(sellStopTwo);
+  expect(market.sellStops.length).toBe(2);
 
   const marketOrder = new Order(null, 90, 'sell', 'market');
   market.fillAtMarket(marketOrder);
 
+  expect(market.sellStops.length).toBe(0);
   expect(sellStopOne.executed).toBe(true);
   expect(sellStopOne.filled).toBe(100);
   expect(sellStopOne.trades.length).toBe(2);
   expect(sellStopTwo.executed).toBe(false);
   expect(sellStopTwo.filled).toBe(70);
   expect(sellStopTwo.trades.length).toBe(1);
+});
+
+test('market only triggers necessary sell stops', () => {
+  const buyOrderOne = new Order(110, 1000, 'buy', 'limit');
+  const buyOrderTwo = new Order(100, 160, 'buy', 'limit');
+  market.addOrder(buyOrderOne);
+  market.addOrder(buyOrderTwo);
+
+  const sellStopOne = new Order(110, 100, 'sell', 'stop');
+  const sellStopTwo = new Order(100, 100, 'sell', 'stop');
+  market.addOrder(sellStopOne);
+  market.addOrder(sellStopTwo);
+  expect(market.sellStops.length).toBe(2);
+
+  const marketOrder = new Order(null, 90, 'sell', 'market');
+  market.fillAtMarket(marketOrder);
+
+  expect(market.sellStops.length).toBe(1);
+  expect(sellStopOne.executed).toBe(true);
+  expect(sellStopOne.filled).toBe(100);
+  expect(sellStopOne.trades.length).toBe(1);
+  expect(sellStopTwo.executed).toBe(false);
+  expect(sellStopTwo.filled).toBe(0);
+  expect(sellStopTwo.trades.length).toBe(0);
 });
 
 test('market triggers buy stops', () => {
@@ -167,20 +193,47 @@ test('market triggers buy stops', () => {
   market.addOrder(sellOrderTwo);
 
   const buyStopOne = new Order(100, 100, 'buy', 'stop');
-  const buyStopTwo = new Order(110, 100, 'buy', 'stop');
+  const buyStopTwo = new Order(105, 100, 'buy', 'stop');
   market.addOrder(buyStopOne);
   market.addOrder(buyStopTwo);
+  expect(market.buyStops.length).toBe(2);
 
   const marketOrder = new Order(null, 90, 'buy', 'market');
 
   market.fillAtMarket(marketOrder);
 
+  expect(market.buyStops.length).toBe(0);
   expect(buyStopOne.executed).toBe(true);
   expect(buyStopOne.filled).toBe(100);
   expect(buyStopOne.trades.length).toBe(2);
   expect(buyStopTwo.executed).toBe(false);
   expect(buyStopTwo.filled).toBe(70);
   expect(buyStopTwo.trades.length).toBe(1);
+});
+
+test('market only triggers necessary buy stops', () => {
+  const sellOrderOne = new Order(110, 100, 'sell', 'limit');
+  const sellOrderTwo = new Order(100, 1600, 'sell', 'limit');
+  market.addOrder(sellOrderOne);
+  market.addOrder(sellOrderTwo);
+
+  const buyStopOne = new Order(100, 100, 'buy', 'stop');
+  const buyStopTwo = new Order(105, 100, 'buy', 'stop');
+  market.addOrder(buyStopOne);
+  market.addOrder(buyStopTwo);
+  expect(market.buyStops.length).toBe(2);
+
+  const marketOrder = new Order(null, 90, 'buy', 'market');
+
+  market.fillAtMarket(marketOrder);
+
+  expect(market.buyStops.length).toBe(1);
+  expect(buyStopOne.executed).toBe(true);
+  expect(buyStopOne.filled).toBe(100);
+  expect(buyStopOne.trades.length).toBe(1);
+  expect(buyStopTwo.executed).toBe(false);
+  expect(buyStopTwo.filled).toBe(0);
+  expect(buyStopTwo.trades.length).toBe(0);
 });
 
 test('market price should update on buy stops filling', () => {
@@ -195,11 +248,13 @@ test('market price should update on buy stops filling', () => {
   const buyStopTwo = new Order(110, 100, 'buy', 'stop');
   market.addOrder(buyStopOne);
   market.addOrder(buyStopTwo);
+  expect(market.buyStops.length).toBe(2);
 
   const marketOrder = new Order(null, 90, 'buy', 'market');
 
   market.fillAtMarket(marketOrder);
 
+  expect(market.buyStops.length).toBe(0);
   expect(market.getMarketPrice()).toBe(150);
 });
 
@@ -215,10 +270,12 @@ test('market price should update on sell stops filling', () => {
   const sellStopTwo = new Order(100, 100, 'sell', 'stop');
   market.addOrder(sellStopOne);
   market.addOrder(sellStopTwo);
+  expect(market.sellStops.length).toBe(2);
 
   const marketOrder = new Order(null, 160, 'sell', 'market');
   market.fillAtMarket(marketOrder);
 
+  expect(market.sellStops.length).toBe(0);
   expect(market.getMarketPrice()).toBe(90);
 });
 
