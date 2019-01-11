@@ -24,14 +24,14 @@ export default class Order {
     if (order instanceof StopOrder) {
       return order.triggered;
     }
+    if (order instanceof MarketOrder) {
+      return order.orderType === 'buy' || order.orderType === 'sell';
+    }
     if (order.orderType !== 'sell' && order.orderType !== 'buy') {
       return false;
     }
     if (order.orderType === this.orderType) {
       return false;
-    }
-    if (order.orderMethod === 'market') {
-      return order.orderType === 'buy' || order.orderType === 'sell';
     }
     if (order.orderMethod === 'limit') {
       if (order.orderType === 'buy') {
@@ -104,6 +104,12 @@ export class StopOrder extends Order {
   trigger() {
     this.triggered = true;
     this.triggeredTime = new Date().getTime();
+  }
+}
+
+export class MarketOrder extends Order {
+  constructor(quantity, type) {
+    super(null, quantity, type, 'market');
   }
 }
 
