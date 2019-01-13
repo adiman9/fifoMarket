@@ -1,5 +1,5 @@
 import TinyQueue from 'tinyqueue';
-import Order, {buyComparator, sellComparator} from '../src/Order';
+import Order, {buyComparator, sellComparator} from '../src/Market/Order';
 
 describe('testing comparators different price', () => {
   let orderA;
@@ -28,13 +28,13 @@ describe('testing comparators different price', () => {
   test('sorting using buy comparator', () => {
     const arr = [orderB, orderA];
     const q = new TinyQueue(arr, buyComparator);
-    expect(q.pop()).toBe(orderB)
+    expect(q.pop()).toBe(orderB);
   });
 
   test('sorting using sell comparator', () => {
     const arr = [orderB, orderA];
     const q = new TinyQueue(arr, sellComparator);
-    expect(q.pop()).toBe(orderA)
+    expect(q.pop()).toBe(orderA);
   });
 });
 
@@ -67,13 +67,13 @@ describe('testing comparators same price', () => {
   test('sorting using buy comparator', () => {
     const arr = [orderB, orderA];
     const q = new TinyQueue(arr, buyComparator);
-    expect(q.pop()).toBe(orderB)
+    expect(q.pop()).toBe(orderB);
   });
 
   test('sorting using sell comparator', () => {
     const arr = [orderB, orderA];
     const q = new TinyQueue(arr, sellComparator);
-    expect(q.pop()).toBe(orderB)
+    expect(q.pop()).toBe(orderB);
   });
 });
 

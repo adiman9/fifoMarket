@@ -1,5 +1,5 @@
 {
- "extends": ["airbnb-base", "prettier"],
+ "extends": ["airbnb-base", "prettier", "plugin:react/recommended"],
   "parserOptions": {
     "ecmaVersion": 2018,
     "sourceType": "module"
@@ -23,5 +23,6 @@
     "no-plusplus": "off",
     "no-underscore-dangle": "off",
     "no-use-before-define": "off",
+    "react/jsx-filename-extension": "off"
   }
 }

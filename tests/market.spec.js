@@ -1,5 +1,5 @@
-import Market from '../src';
-import Order, {StopOrder, MarketOrder} from '../src/Order';
+import Market from '../src/Market';
+import Order, {StopOrder, MarketOrder} from '../src/Market/Order';
 
 let market;
 beforeEach(() => {
